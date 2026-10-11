@@ -1,0 +1,13 @@
+:root{--bg:#F1F4EF;--ink:#16202B;--mute:#53606D;--line:#CBD3CB;--win:#0F766E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Schibsted Grotesk",system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:28px 18px 56px}
+h1{font-size:2rem;line-height:1.1;margin:0 0 16px;letter-spacing:-.02em;font-weight:800}
+h2{font-size:1.2rem;margin:26px 0 6px}
+p,ul{margin:0 0 12px}
+a{color:var(--win)}
+.top{margin-bottom:22px;font-weight:600}
+.top a{color:var(--ink)}
+.upd{color:var(--mute);font-size:.9rem}
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:.9rem;color:var(--mute)}
+footer a{color:var(--ink);margin-right:14px}

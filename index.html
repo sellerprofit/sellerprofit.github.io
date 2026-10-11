@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Etsy Fee Calculator: Profit, Break-Even and Pricing (US, UK, Custom)</title>
+<meta name="description" content="Free Etsy fee calculator for US and UK sellers with editable rates for any country. See profit per sale, your break-even price, the price for a target margin, and what happens if you raise or lower your price.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1F4EF;--ink:#16202B;--mute:#53606D;--line:#CBD3CB;--fee:#E3A008;--cost:#6B7A8F;--win:#0F766E;--loss:#B3261E;--paper:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Schibsted Grotesk",system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:28px 18px 56px}
+h1{font-size:2rem;line-height:1.1;margin:0 0 8px;letter-spacing:-.02em;font-weight:800}
+.lede{color:var(--mute);margin:0 0 22px}
+.modes{display:flex;gap:6px;margin-bottom:16px}
+.modes button,.copy{padding:11px 8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:inherit;font-weight:600;font-size:.95rem;border-radius:6px;cursor:pointer}
+.modes button{flex:1}
+.modes button[aria-pressed=true]{background:var(--ink);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--mute)}
+input,select{font:inherit;font-size:1rem;color:var(--ink);padding:10px;border:1.5px solid var(--line);border-radius:6px;background:var(--paper);width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--win);outline-offset:2px}
+.full{grid-column:1/-1}
+.check{flex-direction:row;align-items:center;gap:8px}
+.check input{width:auto}
+[hidden]{display:none!important}
+details{margin-top:14px;border:1.5px solid var(--line);border-radius:6px;padding:10px 12px;background:var(--paper)}
+summary{cursor:pointer;font-weight:600}
+details .grid{margin-top:12px}
+.hint{font-size:.85rem;color:var(--mute);margin:10px 0 0}
+.result{margin-top:26px;padding-top:20px;border-top:2px solid var(--ink)}
+.big{font-size:2.6rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.sub{color:var(--mute);margin:6px 0 16px}
+.bar{display:flex;height:22px;border-radius:4px;overflow:hidden;background:var(--line)}
+.bar span{display:block;height:100%}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.95rem}
+td,th{padding:7px 0;border-bottom:1px solid var(--line)}
+th{font-size:.85rem;font-weight:600;color:var(--mute);text-align:right}
+th:first-child,.ladder td:first-child{text-align:left}
+td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.ladder td{text-align:right;font-variant-numeric:tabular-nums}
+.ladder tr.now td{font-weight:800}
+.neg{color:var(--loss)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px}
+tr.total td{font-weight:800;border-bottom:0}
+h2.sec{font-size:1.05rem;margin:26px 0 0}
+.be{margin:12px 0 0}
+.note{color:var(--mute);font-size:.85rem;margin-top:14px}
+.share{margin-top:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+article{margin-top:40px;max-width:60ch}
+article h2{font-size:1.2rem;margin:26px 0 6px}article h3{font-size:1rem;margin:16px 0 4px}
+article p{margin:0 0 10px}
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:.9rem;color:var(--mute)}footer a{color:var(--ink);margin-right:14px}footer p{margin:10px 0 0}
+</style>
+<link rel="canonical" href="https://sellerprofit.github.io/">
+<!-- After AdSense approves your site, paste your AdSense script tag here. -->
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much does Etsy take from a $100 sale?", "acceptedAnswer": {"@type": "Answer", "text": "For a US seller with free shipping, Etsy takes $9.95: a $0.20 listing fee, a $6.50 transaction fee (6.5%), and $3.25 in payment processing (3% plus $0.25). If the sale comes from an Offsite Ad at 15%, add $15.00 for $24.95 in total."}}, {"@type": "Question", "name": "Does Etsy charge fees on shipping?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The transaction fee and the payment processing fee are charged on the item price plus the shipping you charge the buyer."}}, {"@type": "Question", "name": "Can I opt out of Offsite Ads fees?", "acceptedAnswer": {"@type": "Answer", "text": "Shops with under $10,000 in sales over the past 365 days can opt out in their shop settings. Once a shop passes that amount, Offsite Ads are mandatory and the fee drops from 15% to 12%."}}]}</script>
+</head>
+<body>
+<main>
+  <h1>Etsy fee calculator</h1>
+  <p class="lede">See what you keep from each sale, find your break-even price, or work out the price that gets you the profit you want.</p>
+
+  <div class="modes">
+    <button type="button" id="m-fees" aria-pressed="true">What will I keep?</button>
+    <button type="button" id="m-price" aria-pressed="false">What should I charge?</button>
+  </div>
+
+  <div class="grid">
+    <label class="full">Where is your shop based?
+      <select id="country">
+        <option value="us">United States</option>
+        <option value="uk">United Kingdom</option>
+        <option value="other">Other country (enter your rates)</option>
+      </select>
+    </label>
+    <label id="l-price">Item price
+      <input id="price" type="number" inputmode="decimal" min="0" step="0.01" value="25">
+    </label>
+    <label id="l-ttype" hidden>My goal is a
+      <select id="ttype">
+        <option value="amt">Profit amount</option>
+        <option value="pct">Profit margin (%)</option>
+      </select>
+    </label>
+    <label id="l-target" hidden><span id="t-label">Profit I want</span>
+      <input id="target" type="number" inputmode="decimal" step="0.01" value="10">
+    </label>
+    <label>Shipping you charge
+      <input id="ship" type="number" inputmode="decimal" min="0" step="0.01" value="5">
+    </label>
+    <label>Your item cost
+      <input id="cost" type="number" inputmode="decimal" min="0" step="0.01" value="8">
+    </label>
+    <label>Your real shipping cost
+      <input id="shipcost" type="number" inputmode="decimal" min="0" step="0.01" value="4.50">
+    </label>
+    <label class="full">Offsite Ads
+      <select id="ads">
+        <option value="0">Sale did not come from an Offsite Ad</option>
+        <option value="0.15">Offsite Ad sale, 15% (under $10k a year)</option>
+        <option value="0.12">Offsite Ad sale, 12% ($10k+ a year)</option>
+      </select>
+    </label>
+    <label class="full check"><input id="listing" type="checkbox" checked> Include the listing fee</label>
+  </div>
+
+  <details>
+    <summary>Edit fee rates</summary>
+    <div class="grid">
+      <label>Transaction fee (%)<input id="r-t" type="number" inputmode="decimal" min="0" step="0.01"></label>
+      <label>Listing fee<input id="r-l" type="number" inputmode="decimal" min="0" step="0.01"></label>
+      <label>Processing fee (%)<input id="r-p" type="number" inputmode="decimal" min="0" step="0.01"></label>
+      <label>Processing fixed fee<input id="r-f" type="number" inputmode="decimal" min="0" step="0.01"></label>
+      <label>Regulatory operating fee (%)<input id="r-g" type="number" inputmode="decimal" min="0" step="0.01"></label>
+      <label>VAT on Etsy fees (%)<input id="r-v" type="number" inputmode="decimal" min="0" step="0.01"></label>
+      <label class="full">Offsite Ads cap per order (leave empty for none)<input id="r-cap" type="number" inputmode="decimal" min="0" step="0.01"></label>
+    </div>
+    <p class="hint">These fill in automatically when you pick a country. Change them if Etsy's rates for your shop are different.</p>
+  </details>
+
+  <section class="result" aria-live="polite">
+    <div class="big" id="big"></div>
+    <p class="sub" id="sub"></p>
+    <div class="bar" id="bar" role="img" aria-label="Where the buyer's payment goes"></div>
+    <table id="rows"></table>
+    <p class="note" id="note"></p>
+
+    <h2 class="sec">If you change your price</h2>
+    <table class="ladder" id="ladder"></table>
+    <p class="be" id="be"></p>
+  </section>
+
+  <div class="share">
+    <button type="button" class="copy" id="copy">Copy link to these numbers</button>
+    <span class="note" id="copied" style="margin:0"></span>
+  </div>
+
+  <p class="note">US and UK rates checked June 2026. Sources disagreed on some UK figures, and Etsy changed regulatory fees in June 2026, so confirm your rates at etsy.com/legal/fees. Sales tax is not included.</p>
+
+  <article>
+    <h2>How Etsy fees add up</h2>
+    <p>On a typical US sale, Etsy charges a $0.20 listing fee, a 6.5% transaction fee, and payment processing of 3% plus $0.25. The transaction fee and processing fee are both charged on the item price plus the shipping you charge, so shipping is not a way around them.</p>
+    <h2>What Offsite Ads cost</h2>
+    <p>If a buyer clicks one of Etsy's ads on another site and buys from your shop within 30 days, Etsy charges 15% of the order. Shops above $10,000 in yearly sales pay 12%. In the US the fee is capped at $100 per order, and smaller shops can usually opt out in their settings.</p>
+    <h2>UK sellers: VAT and the regulatory fee</h2>
+    <p>UK sellers pay a higher processing rate than US sellers, plus a small regulatory operating fee on each sale, and VAT is added on top of Etsy's fees. If you are VAT-registered you may be able to reclaim that VAT, so set the VAT rate to 0 under "Edit fee rates" to see your figures without it.</p>
+    <h2>Pricing for profit, not guesses</h2>
+    <p>Your break-even price is the lowest item price where you neither make nor lose money after Etsy's fees, your item cost, and your real shipping cost. Anything above it is profit. The price table shows how fast profit grows when you raise your price, because fees take a percentage but your costs stay fixed. A small increase often adds more to your profit than it appears.</p>
+    <h2>Why cheap items lose the most</h2>
+    <p>The fixed fees (listing plus the processing fixed amount) take a much bigger share of a $5 item than a $50 one. If your margins feel thin on low-priced items, test a higher price or a shipping charge here before you list.</p>
+    <h2>Common questions</h2>
+    <h3>How much does Etsy take from a $100 sale?</h3>
+    <p>For a US seller with free shipping, Etsy takes $9.95: a $0.20 listing fee, a $6.50 transaction fee (6.5%), and $3.25 in payment processing (3% plus $0.25). If the sale comes from an Offsite Ad at 15%, add $15.00 for $24.95 in total.</p>
+    <h3>Does Etsy charge fees on shipping?</h3>
+    <p>Yes. The transaction fee and the payment processing fee are charged on the item price plus the shipping you charge the buyer.</p>
+    <h3>Can I opt out of Offsite Ads fees?</h3>
+    <p>Shops with under $10,000 in sales over the past 365 days can opt out in their shop settings. Once a shop passes that amount, Offsite Ads are mandatory and the fee drops from 15% to 12%.</p>
+  </article>
+  <footer>
+    <nav><a href="about.html">About</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy policy</a></nav>
+    <p>This calculator gives estimates only. Confirm current rates with Etsy. Not affiliated with or endorsed by Etsy. Etsy is a trademark of Etsy, Inc.</p>
+  </footer>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const n = id => Math.max(0, parseFloat($(id).value) || 0);
+const PRESETS = {
+  us:    {sym:'$', t:6.5, p:3, f:0.25, g:0,    v:0,  l:0.20, cap:100},
+  uk:    {sym:'£', t:6.5, p:4, f:0.20, g:0.48, v:20, l:0.16, cap:''},
+  other: {sym:'',  t:6.5, p:3, f:0.25, g:0,    v:0,  l:0.20, cap:''}
+};
+const IDS = ['country','price','target','ttype','ship','cost','shipcost','ads','r-t','r-l','r-p','r-f','r-g','r-v','r-cap'];
+let mode = 'fees', sym = '$';
+const money = v => (v < 0 ? '-' : '') + sym + Math.abs(v).toFixed(2);
+const pct = x => String(+(x * 100).toFixed(2)) + '%';
+
+function setMode(m) {
+  mode = m;
+  $('m-fees').setAttribute('aria-pressed', m === 'fees');
+  $('m-price').setAttribute('aria-pressed', m === 'price');
+  $('l-price').hidden = m !== 'fees';
+  $('l-target').hidden = m !== 'price';
+  $('l-ttype').hidden = m !== 'price';
+  run();
+}
+
+function setCountry() {
+  const q = PRESETS[$('country').value];
+  sym = q.sym;
+  ['t','p','f','g','v','l','cap'].forEach(k => { $('r-' + k).value = q[k]; });
+  run();
+}
+
+function run() {
+  const S = n('ship'), C = n('cost'), SC = n('shipcost'), o = +$('ads').value;
+  const t = n('r-t') / 100, p = n('r-p') / 100, f = n('r-f'), g = n('r-g') / 100, v = n('r-v') / 100;
+  const cap = $('r-cap').value === '' ? Infinity : n('r-cap');
+  const L = $('listing').checked ? n('r-l') : 0;
+  const k = 1 + v;
+  const type = $('ttype').value;
+  $('t-label').textContent = type === 'pct' ? 'Margin I want (%)' : 'Profit I want';
+
+  // Order total R (item + shipping) that gives a target: an amount, or a share of R.
+  const solveR = (T, kind) => {
+    const fixed = C + SC + k * (L + f) + (kind === 'amt' ? T : 0);
+    const m = kind === 'pct' ? T / 100 : 0;
+    let R = fixed / Math.max(0.05, 1 - k * (t + p + g + o) - m);
+    if (o * R > cap) R = (fixed + k * cap) / Math.max(0.05, 1 - k * (t + p + g) - m);
+    return R;
+  };
+  const calc = R => {
+    const tr = t * R, pr = R > 0 ? p * R + f : 0, rg = g * R, ad = Math.min(o * R, cap);
+    const sub = L + tr + pr + rg + ad, vat = v * sub, fees = sub + vat;
+    return {R, tr, pr, rg, ad, vat, fees, profit: R - fees - C - SC};
+  };
+
+  let P, T = 0, note = '';
+  if (mode === 'fees') {
+    P = n('price');
+  } else {
+    T = parseFloat($('target').value) || 0;
+    P = solveR(T, type) - S;
+    if (P < 0) { P = 0; note = 'Your shipping charge alone already covers this goal.'; }
+  }
+
+  const x = calc(P + S), R = x.R, profit = x.profit;
+  const margin = R > 0 ? profit / R * 100 : 0;
+
+  if (mode === 'fees') {
+    $('big').textContent = money(profit);
+    $('big').style.color = profit < 0 ? 'var(--loss)' : 'var(--win)';
+    $('sub').textContent = profit < 0
+      ? 'You lose money on this sale. The buyer pays ' + money(R) + '.'
+      : 'profit on this sale, ' + margin.toFixed(1) + '% of the ' + money(R) + ' the buyer pays.';
+  } else {
+    $('big').textContent = money(P);
+    $('big').style.color = 'var(--ink)';
+    $('sub').textContent = type === 'pct'
+      ? 'item price for a ' + +T.toFixed(2) + '% margin, which is ' + money(profit) + ' profit. The buyer pays ' + money(R) + ' in total.'
+      : 'item price to keep ' + money(T) + ' after fees and costs. The buyer pays ' + money(R) + ' in total.';
+  }
+
+  const scale = Math.max(R, x.fees + C + SC) || 1;
+  const w = a => (Math.max(0, a) / scale * 100).toFixed(2) + '%';
+  $('bar').innerHTML =
+    '<span style="width:' + w(x.fees) + ';background:var(--fee)"></span>' +
+    '<span style="width:' + w(C + SC) + ';background:var(--cost)"></span>' +
+    '<span style="width:' + w(profit) + ';background:var(--win)"></span>';
+
+  const row = (c, label, a, cls) =>
+    '<tr class="' + (cls || '') + '"><td><span class="sw" style="background:' + c + '"></span>' + label + '</td><td>' + money(a) + '</td></tr>';
+  let h = '';
+  if (L) h += row('var(--fee)', 'Listing fee', L);
+  h += row('var(--fee)', 'Transaction fee (' + pct(t) + ')', x.tr);
+  h += row('var(--fee)', 'Payment processing (' + pct(p) + ' + ' + sym + f.toFixed(2) + ')', x.pr);
+  if (g) h += row('var(--fee)', 'Regulatory operating fee (' + pct(g) + ')', x.rg);
+  if (o) h += row('var(--fee)', 'Offsite Ads fee (' + pct(o) + ')', x.ad);
+  if (v) h += row('var(--fee)', 'VAT on Etsy fees (' + pct(v) + ')', x.vat);
+  h += row('var(--cost)', 'Your item cost', C);
+  h += row('var(--cost)', 'Your shipping cost', SC);
+  h += row(profit < 0 ? 'var(--loss)' : 'var(--win)', 'Profit', profit, 'total');
+  $('rows').innerHTML = h;
+  $('note').textContent = note;
+
+  // Price ladder around the current item price
+  let lad = '';
+  if (P > 0) {
+    lad = '<tr><th>Item price</th><th>Profit</th><th>Margin</th></tr>';
+    [-20, -10, 0, 10, 20, 30].forEach(d => {
+      const y = calc(P * (1 + d / 100) + S);
+      const pm = y.R > 0 ? y.profit / y.R * 100 : 0;
+      lad += '<tr class="' + (d === 0 ? 'now' : '') + '"><td>' + money(P * (1 + d / 100)) + (d === 0 ? ' (now)' : '') +
+        '</td><td class="' + (y.profit < 0 ? 'neg' : '') + '">' + money(y.profit) +
+        '</td><td class="' + (y.profit < 0 ? 'neg' : '') + '">' + pm.toFixed(1) + '%</td></tr>';
+    });
+  }
+  $('ladder').innerHTML = lad;
+  const be = Math.max(0, solveR(0, 'amt') - S);
+  $('be').textContent = 'Break-even item price: ' + money(be) + '. Below this you lose money on each sale.';
+}
+
+function shareLink() {
+  const q = new URLSearchParams();
+  IDS.forEach(id => q.set(id, $(id).value));
+  q.set('listing', $('listing').checked ? '1' : '0');
+  q.set('mode', mode);
+  const url = location.href.split('#')[0].split('?')[0] + '?' + q.toString();
+  const say = s => { $('copied').textContent = s; };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => say('Link copied.'), () => say(url));
+  } else {
+    say(url);
+  }
+}
+
+function loadFromLink() {
+  const q = new URLSearchParams(location.search);
+  if (q.has('country') && PRESETS[q.get('country')]) { $('country').value = q.get('country'); setCountry(); }
+  IDS.forEach(id => { if (q.has(id)) $(id).value = q.get(id); });
+  if (q.has('listing')) $('listing').checked = q.get('listing') === '1';
+  setMode(q.get('mode') === 'price' ? 'price' : 'fees');
+}
+
+document.querySelectorAll('input,select').forEach(el => el.addEventListener('input', run));
+$('country').addEventListener('change', setCountry);
+$('m-fees').addEventListener('click', () => setMode('fees'));
+$('m-price').addEventListener('click', () => setMode('price'));
+$('copy').addEventListener('click', shareLink);
+setCountry();
+loadFromLink();
+</script>
+</body>
+</html>
